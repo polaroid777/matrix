@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Matrix</title>
+	</head>
+	<body>
+		<canvas id="myCanvas" width="200" height="100" style="border: 1px solid #000"></canvas>
+
+		<script>
+			const canvas = document.getElementById('myCanvas');
+			const ctx = canvas.getContext('2d'); // Отримуємо 2D-контекст
+
+			ctx.fillStyle = 'blue'; // Колір заливки
+			ctx.fillRect(10, 10, 100, 50); // Малюємо прямокутник
+
+			ctx.beginPath();
+			ctx.arc(75, 75, 50, 0, 2 * Math.PI); // x, y, радіус, початок, кінець дуги
+			ctx.fillStyle = 'green';
+			ctx.fill();
+			ctx.stroke();
+		</script>
+	</body>
+</html>
