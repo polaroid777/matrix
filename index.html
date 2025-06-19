@@ -4,22 +4,109 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Matrix</title>
+		<style>
+			my-greeting {
+				--text-color: rgb(11, 102, 91);
+			}
+		</style>
 	</head>
 	<body>
-		<canvas id="myCanvas" width="200" height="100" style="border: 1px solid #000"></canvas>
+		<canvas id="signature" width="400" height="200" style="border: 1px solid #000"></canvas>
+		<br />
+		<button onclick="clearCanvas()">Очистити</button>
+		<button onclick="saveSignature()">Зберегти</button>
+
+		<my-counter></my-counter>
+
+		<my-greeting>Mykola</my-greeting>
+
+		<my-greeting></my-greeting>
+
+		<script type="module" src="index.js"></script>
 
 		<script>
-			const canvas = document.getElementById('myCanvas');
-			const ctx = canvas.getContext('2d'); // Отримуємо 2D-контекст
+			const canvas = document.getElementById('signature');
+			const ctx = canvas.getContext('2d');
 
-			ctx.fillStyle = 'blue'; // Колір заливки
-			ctx.fillRect(10, 10, 100, 50); // Малюємо прямокутник
+			let drawing = false;
 
-			ctx.beginPath();
-			ctx.arc(75, 75, 50, 0, 2 * Math.PI); // x, y, радіус, початок, кінець дуги
-			ctx.fillStyle = 'green';
-			ctx.fill();
-			ctx.stroke();
+			canvas.addEventListener('mousedown', (e) => {
+				drawing = true;
+				const pos = getPos(e);
+				ctx.beginPath();
+				ctx.moveTo(pos.x, pos.y);
+			});
+
+			canvas.addEventListener('mousemove', (e) => {
+				if (!drawing) return;
+				const pos = getPos(e);
+				ctx.lineTo(pos.x, pos.y);
+				ctx.strokeStyle = 'black';
+				ctx.lineWidth = 2;
+				ctx.lineCap = 'round';
+				ctx.stroke();
+			});
+
+			canvas.addEventListener('mouseup', () => (drawing = false));
+			canvas.addEventListener('mouseleave', () => (drawing = false));
+
+			canvas.addEventListener(
+				'touchstart',
+				(e) => {
+					e.preventDefault();
+					const touch = e.touches[0];
+					drawing = true;
+					const pos = getTouchPos(touch);
+					ctx.beginPath();
+					ctx.moveTo(pos.x, pos.y);
+				},
+				{ passive: false }
+			);
+
+			canvas.addEventListener(
+				'touchmove',
+				(e) => {
+					e.preventDefault();
+					if (!drawing) return;
+					const touch = e.touches[0];
+					const pos = getTouchPos(touch);
+					ctx.lineTo(pos.x, pos.y);
+					ctx.stroke();
+				},
+				{ passive: false }
+			);
+
+			canvas.addEventListener('touchend', () => (drawing = false));
+
+			function getPos(e) {
+				const rect = canvas.getBoundingClientRect();
+				return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+			}
+
+			function getTouchPos(touch) {
+				const rect = canvas.getBoundingClientRect();
+				return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+			}
+
+			function clearCanvas() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+			}
+
+			function saveSignature() {
+				const base64 = canvas.toDataURL('image/png');
+				console.log('📋 Base64:', base64);
+
+				localStorage.setItem('signature', base64);
+
+				// або відправити через fetch:
+				/*
+    fetch("/api/upload", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ signature: base64 })
+    });
+    */
+			}
 		</script>
 	</body>
 </html>
